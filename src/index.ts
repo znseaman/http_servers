@@ -1,9 +1,9 @@
 import express from "express";
-import { handlerReadiness } from "./readiness";
-import { handlerMetrics } from "./metrics";
-import { handlerReset } from "./reset";
-import { handlerChirpValidate } from "./chirps";
-import { middlewareLogResponse, middlewareMetricsInc } from "./middleware";
+import { handlerReadiness } from "./api/readiness";
+import { handlerMetrics } from "./api/metrics";
+import { handlerReset } from "./api/reset";
+import { handlerChirpValidate } from "./api/chirps";
+import { middlewareLogResponse, middlewareMetricsInc } from "./api/middleware";
 
 const app = express();
 const PORT = 7070;
