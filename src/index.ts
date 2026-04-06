@@ -14,6 +14,6 @@ app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-app.get("/healthz", handlerReadiness);
-app.get("/metrics", handlerMetrics);
-app.get("/reset", handlerReset);
+app.get("/api/healthz", handlerReadiness);
+app.get("/admin/metrics", handlerMetrics);
+app.get("/admin/reset", handlerReset);
