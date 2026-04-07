@@ -7,22 +7,34 @@ type ChirpRequest = {
 
 export function handlerChirpValidate(req: Request, res: Response) {
   try {
-    const returnData = isChirpValid(req);
-    respondWithJSON(res, 200, returnData);
+    if (!req.body.body) {
+      throw Error(
+        `Something went wrong. Ensure the JSON includes a "body" field.`,
+      );
+    }
+    const cleanedBody = replaceProfanities(req);
+    throwsIfChirpInvalid(cleanedBody);
+    respondWithJSON(res, 200, { cleanedBody });
   } catch (error: any) {
     respondWithError(res, 400, error.message);
   }
 }
 
-function isChirpValid(req: Request) {
-  let params: ChirpRequest = req.body;
-
+function throwsIfChirpInvalid(chirp: string) {
   const MAX_CHAR_LENGTH = 140;
-  if (params?.body?.length > MAX_CHAR_LENGTH) {
+  if (chirp.length > MAX_CHAR_LENGTH) {
     throw Error("Chirp is too long");
   }
-  if (params?.body?.length <= MAX_CHAR_LENGTH) {
-    return { valid: true };
+}
+
+function replaceProfanities(req: Request) {
+  const PROFANITIES = new Set(["kerfuffle", "sharbert", "fornax"]);
+  const REPLACEMENT = "****";
+  let cleanedBody = [];
+  let words = req.body.body.split(" ");
+  for (let word of words) {
+    cleanedBody.push(PROFANITIES.has(word.toLowerCase()) ? REPLACEMENT : word);
   }
-  throw Error(`Something went wrong. Ensure the JSON includes a "body" field.`);
+
+  return cleanedBody.join(" ");
 }
