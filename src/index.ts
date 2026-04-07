@@ -3,7 +3,11 @@ import { handlerReadiness } from "./api/readiness";
 import { handlerMetrics } from "./api/metrics";
 import { handlerReset } from "./api/reset";
 import { handlerChirpValidate } from "./api/chirps";
-import { middlewareLogResponse, middlewareMetricsInc } from "./api/middleware";
+import {
+  middlewareHandleErrors,
+  middlewareLogResponse,
+  middlewareMetricsInc,
+} from "./api/middleware";
 
 const app = express();
 const PORT = 7070;
@@ -22,3 +26,5 @@ app.get("/api/healthz", handlerReadiness);
 app.post("/api/validate_chirp", handlerChirpValidate);
 app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerReset);
+
+app.use(middlewareHandleErrors);

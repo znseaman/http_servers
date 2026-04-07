@@ -1,11 +1,15 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json";
 
 type ChirpRequest = {
   body: string;
 };
 
-export function handlerChirpValidate(req: Request, res: Response) {
+export function handlerChirpValidate(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     if (!req.body.body) {
       throw Error(
@@ -16,7 +20,8 @@ export function handlerChirpValidate(req: Request, res: Response) {
     throwsIfChirpInvalid(cleanedBody);
     respondWithJSON(res, 200, { cleanedBody });
   } catch (error: any) {
-    respondWithError(res, 400, error.message);
+    next(error);
+    // respondWithError(res, 400, error.message);
   }
 }
 
