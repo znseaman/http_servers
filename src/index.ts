@@ -8,6 +8,9 @@ import { middlewareLogResponse, middlewareMetricsInc } from "./api/middleware";
 const app = express();
 const PORT = 7070;
 
+// Built-in JSON body parsing middleware
+app.use(express.json());
+
 app.use(middlewareLogResponse);
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
