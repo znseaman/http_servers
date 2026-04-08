@@ -1,16 +1,25 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness";
 import { handlerMetrics } from "./api/metrics";
-import { handlerReset } from "./api/reset";
-import { handlerChirpValidate } from "./api/chirps";
+import { handlerCreateChirp, handlerGetChirps } from "./api/chirps";
+import { handlerCreateUser, handlerDeleteUsers } from "./api/users";
 import {
   middlewareHandleErrors,
   middlewareLogResponse,
   middlewareMetricsInc,
 } from "./api/middleware";
 
+import { config } from "./config";
+import postgres from "postgres";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+
+const migrationClient = postgres(config.db.url, { max: 1 });
+(async () => {
+  await migrate(drizzle(migrationClient), config.db.migrationConfig);
+})();
+
 const app = express();
-const PORT = 7070;
 
 // Built-in JSON body parsing middleware
 app.use(express.json());
@@ -18,13 +27,15 @@ app.use(express.json());
 app.use(middlewareLogResponse);
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+app.listen(config.api.port, () => {
+  console.log(`Server is running at http://localhost:${config.api.port}`);
 });
 
+app.post("/api/chirps", handlerCreateChirp);
+app.get("/api/chirps", handlerGetChirps);
 app.get("/api/healthz", handlerReadiness);
-app.post("/api/validate_chirp", handlerChirpValidate);
+app.post("/api/users", handlerCreateUser);
 app.get("/admin/metrics", handlerMetrics);
-app.post("/admin/reset", handlerReset);
+app.post("/admin/reset", handlerDeleteUsers);
 
 app.use(middlewareHandleErrors);

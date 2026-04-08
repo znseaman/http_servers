@@ -22,7 +22,7 @@ export function middlewareMetricsInc(
   res: Response,
   next: NextFunction,
 ) {
-  config.fileServerHits++;
+  config.api.fileServerHits++;
   next();
 }
 
@@ -32,7 +32,9 @@ export function middlewareHandleErrors(
   res: Response,
   next: NextFunction,
 ) {
-  console.log(`[ERROR] ${err.message} ${err.stack}`);
+  console.log(
+    `[ERROR] ${err.message} ${err.stack} - ${err.cause} - ${err.name}`,
+  );
   respondWithError(res, 500, "Something went wrong on our end");
   return;
 }
