@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json";
-import { createChirp, getChirps } from "../db/queries/chirps";
+import { createChirp, getChirp, getChirps } from "../db/queries/chirps";
 import { uuid } from "drizzle-orm/pg-core";
 import { NewChirp } from "../db/schema";
 
@@ -66,7 +66,7 @@ export async function handlerCreateChirp(
       user_id: req.body.userId,
     };
     const result = await createChirp(chirp);
-    respondWithJSON(res, 201, { body: chirp.body, userId: chirp.user_id });
+    respondWithJSON(res, 201, result);
   } catch (error) {
     next(error);
   }
@@ -81,6 +81,29 @@ export async function handlerGetChirps(
     const results = await getChirps();
     respondWithJSON(res, 200, results);
   } catch (error) {
+    next(error);
+  }
+}
+
+export async function handlerGetChirp(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  // @ts-ignore
+  let chirpId: string = req.params.chirpId;
+  console.log(`chirpId: ${chirpId}`);
+  try {
+    const results = await getChirp(chirpId);
+    if (results) {
+      respondWithJSON(res, 200, results);
+      return;
+    } else {
+      respondWithError(res, 404, "Not Found");
+      return;
+    }
+  } catch (error: any) {
+    console.log(`ERROR: ${error.message} - ${error.stack}`);
     next(error);
   }
 }

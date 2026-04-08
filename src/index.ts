@@ -1,7 +1,11 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness";
 import { handlerMetrics } from "./api/metrics";
-import { handlerCreateChirp, handlerGetChirps } from "./api/chirps";
+import {
+  handlerCreateChirp,
+  handlerGetChirp,
+  handlerGetChirps,
+} from "./api/chirps";
 import { handlerCreateUser, handlerDeleteUsers } from "./api/users";
 import {
   middlewareHandleErrors,
@@ -33,6 +37,7 @@ app.listen(config.api.port, () => {
 
 app.post("/api/chirps", handlerCreateChirp);
 app.get("/api/chirps", handlerGetChirps);
+app.get("/api/chirps/:chirpId", handlerGetChirp);
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/users", handlerCreateUser);
 app.get("/admin/metrics", handlerMetrics);
