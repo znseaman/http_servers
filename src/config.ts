@@ -16,9 +16,14 @@ type APIConfig = {
   platform: string;
 };
 
+type AuthConfig = {
+  secret: string;
+};
+
 type Config = {
   api: APIConfig;
   db: DBConfig;
+  auth: AuthConfig;
 };
 
 loadEnvFile();
@@ -36,4 +41,7 @@ export const config: Config = {
     platform: envOrThrow("PLATFORM"),
   },
   db: { url: envOrThrow("DB_URL"), migrationConfig },
+  auth: {
+    secret: envOrThrow("SECRET"),
+  },
 };

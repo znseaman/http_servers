@@ -17,6 +17,7 @@ import { config } from "./config";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/auth";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 (async () => {
@@ -35,11 +36,15 @@ app.listen(config.api.port, () => {
   console.log(`Server is running at http://localhost:${config.api.port}`);
 });
 
+// @ts-ignore
+app.post("/api/login", handlerLogin);
 app.post("/api/chirps", handlerCreateChirp);
 app.get("/api/chirps", handlerGetChirps);
 app.get("/api/chirps/:chirpId", handlerGetChirp);
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/users", handlerCreateUser);
+app.post("/api/refresh", handlerRefresh);
+app.post("/api/revoke", handlerRevoke);
 app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerDeleteUsers);
 

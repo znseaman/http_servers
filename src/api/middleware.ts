@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config";
 import { respondWithError } from "./json";
+import {
+  BadRequestError,
+  NotFoundError,
+  UserForbiddenError,
+  UserNotAuthenticatedError,
+} from "./errors";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 export async function middlewareLogResponse(
   _: Request,
@@ -32,9 +39,29 @@ export function middlewareHandleErrors(
   res: Response,
   next: NextFunction,
 ) {
-  console.log(
-    `[ERROR] ${err.message} ${err.stack} - ${err.cause} - ${err.name}`,
-  );
-  respondWithError(res, 500, "Something went wrong on our end");
-  return;
+  let statusCode = 500;
+  let message = "Something went wrong on our end";
+
+  if (err instanceof BadRequestError) {
+    statusCode = 400;
+    message = err.message;
+  } else if (err instanceof UserNotAuthenticatedError) {
+    statusCode = 401;
+    message = err.message;
+  } else if (err instanceof UserForbiddenError) {
+    statusCode = 403;
+    message = err.message;
+  } else if (err instanceof NotFoundError) {
+    statusCode = 404;
+    message = err.message;
+  } else if (err instanceof JsonWebTokenError) {
+    statusCode = 401;
+    message = err.message;
+  }
+
+  if (statusCode >= 500) {
+    console.log(err.message, err.stack);
+  }
+
+  respondWithError(res, statusCode, message);
 }
