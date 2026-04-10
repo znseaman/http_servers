@@ -3,10 +3,15 @@ import { handlerReadiness } from "./api/readiness";
 import { handlerMetrics } from "./api/metrics";
 import {
   handlerCreateChirp,
+  handlerDeleteChirp,
   handlerGetChirp,
   handlerGetChirps,
 } from "./api/chirps";
-import { handlerCreateUser, handlerDeleteUsers } from "./api/users";
+import {
+  handlerCreateUser,
+  handlerDeleteUsers,
+  handlerUpdateUser,
+} from "./api/users";
 import {
   middlewareHandleErrors,
   middlewareLogResponse,
@@ -41,8 +46,10 @@ app.post("/api/login", handlerLogin);
 app.post("/api/chirps", handlerCreateChirp);
 app.get("/api/chirps", handlerGetChirps);
 app.get("/api/chirps/:chirpId", handlerGetChirp);
+app.delete("/api/chirps/:chirpId", handlerDeleteChirp);
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/users", handlerCreateUser);
+app.put("/api/users", handlerUpdateUser);
 app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
 app.get("/admin/metrics", handlerMetrics);

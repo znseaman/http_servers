@@ -20,3 +20,16 @@ export async function getUser(email: string) {
   const [result] = await db.select().from(users).where(eq(users.email, email));
   return result;
 }
+
+export async function updateUser(user: {
+  email: string;
+  hashed_password: string;
+  id: string;
+}) {
+  const [result] = await db
+    .update(users)
+    .set({ email: user.email, hashed_password: user.hashed_password })
+    .where(eq(users.id, user.id))
+    .returning();
+  return result;
+}
