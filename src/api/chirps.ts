@@ -5,6 +5,7 @@ import {
   deleteChirp,
   getChirp,
   getChirps,
+  getChirpsByUserId,
 } from "../db/queries/chirps";
 import { NewChirp } from "../db/schema";
 import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors";
@@ -79,8 +80,41 @@ export async function handlerGetChirps(
   res: Response,
   next: NextFunction,
 ) {
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+
+  let orderBy = undefined;
+  let sortQuery = req.query.sort;
+  if (typeof sortQuery === "string") {
+    if (sortQuery == "asc" || sortQuery == "desc") {
+      orderBy = sortQuery;
+    }
+  }
+
   try {
-    const results = await getChirps();
+    const results = authorId
+      ? await getChirpsByUserId(authorId)
+      : await getChirps();
+
+    const ascend = function (
+      a: { createdAt: number },
+      b: { createdAt: number },
+    ) {
+      return a.createdAt - b.createdAt;
+    };
+    const decend = function (
+      a: { createdAt: number },
+      b: { createdAt: number },
+    ) {
+      return b.createdAt - a.createdAt;
+    };
+    const sortFn: any = orderBy == "asc" || !orderBy ? ascend : decend;
+
+    results.sort(sortFn);
+
     respondWithJSON(res, 200, results);
   } catch (error) {
     next(error);

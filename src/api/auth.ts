@@ -107,6 +107,7 @@ export async function handlerLogin(
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         email: user.email,
+        isChirpyRed: user.isChirpyRed,
         token: token,
         refreshToken: refreshToken.token,
       } satisfies UserResponse);
@@ -171,4 +172,8 @@ export async function handlerRevoke(
   } catch (error) {
     next(error);
   }
+}
+
+export function getAPIKey(req: Request): string {
+  return req.get("Authorization")?.replaceAll("ApiKey ", "") || "";
 }
